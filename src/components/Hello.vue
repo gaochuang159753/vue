@@ -3,7 +3,7 @@
     <div class="logo">
       <h1 class="company">傻果科技</h1>
       <el-tabs v-model="activeName">
-        <el-tab-pane label="注册" name="0">
+        <el-tab-pane label="注册" name="1">
           <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="80px" class="demo-ruleForm">
             <el-form-item label="用户名" prop="name">
               <el-input v-model="ruleForm2.name" placeholder="请输入姓名"></el-input>
@@ -22,7 +22,7 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="登录" name="1">
+        <el-tab-pane label="登录" name="2">
           <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="80px" class="demo-ruleForm">
             <el-form-item label="邮箱" prop="phone" required>
               <el-input v-model.number="ruleForm1.phone" placeholder="请输入邮箱"></el-input>
@@ -67,7 +67,7 @@ export default {
       };
     return {
       msg: 'Welcome to Your Vue.js App',
-      activeName:'0',
+      activeName:'1',
       ruleForm2:{
         name:'',
         phone:'',
@@ -92,15 +92,18 @@ export default {
     }
   },
   mounted(){
-
+    this.index();
   },
   methods:{
+    index(){
+      this.activeName=this.$route.params.id;
+    },
     submitLogin(form){
       var self = this;
       this.$refs[form].validate((valid) => {
         if (valid) {
           // self.$router.push('/index');
-          var url="http://hzmozhi.com:81/emailLogin",
+          var url="/emailLogin",
               param={
                 email:self.ruleForm1.phone,
                 pwd:md5(self.ruleForm1.pass)
@@ -110,7 +113,7 @@ export default {
                 self.setCookie('userName',res.data.userName);
                 self.setCookie('userId',res.data.userId);
                 self.setCookie('email',res.data.email);
-                self.$router.push('/index');
+                self.$router.push('/');
               };
           self.$post(url,param,successd);
         } else {
@@ -124,7 +127,7 @@ export default {
       this.$refs[form].validate((valid) => {
         if (valid) {
           // self.$router.push('/index');
-          var url="http://hzmozhi.com:81/emailReg",
+          var url="/emailReg",
               param={
                 email:self.ruleForm2.phone,
                 pwd:self.ruleForm2.pass,

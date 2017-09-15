@@ -1,11 +1,12 @@
 import axios from 'axios'
+import util from './js/util.js'
 export default {
     install(Vue,options){
         Vue.prototype.$get=function (url,params,successd) {
             var self = this;
             params.accessToken=this.getCookie('accessToken');
             axios({
-                url:url,
+                url:util.testUrl+url,
                 method:'get',
                 params:params
             }).then(function(params) {
@@ -20,7 +21,7 @@ export default {
             var self = this;
             params.accessToken=this.getCookie('accessToken');
             axios({
-                url:url,
+                url:util.testUrl+url,
                 method:'post',
                 params:params
             }).then(function(params) {

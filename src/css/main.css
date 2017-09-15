@@ -12,7 +12,26 @@ a{color:#0099ff;text-decoration:none}
 a:hover{color:#0082d5;}
 .clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
 html{height: 100%;background: #f5f8fa;}
-body{min-height: 100%;position: relative;}
+body{min-height: 100%;}
 
 /* 公共样式 */
 .text_align_center{text-align: center;}
+.text_align_right{text-align: right;}
+.margin_left_50{margin-left: 50px;}
+.font_size_18{font-size: 18px;}
+.font_size_16{font-size: 16px;}
+.font_size_14{font-size: 14px;}
+.font_size_12{font-size: 12px;}
+.font_size_20{font-size: 20px;}
+.display_inlineblock{display: inline-block;}
+.margin_left_10{margin-left: 10px;}
+.margin_left_20{margin-left: 20px;}
+.margin_right_10{margin-right: 10px;}
+.margin_right_20{margin-right: 20px;}
+.margin_top_20{margin-top: 20px;}
+.cursor_pointer{cursor: pointer;}
+.color_20a0ff{color: #20a0ff;}
+
+
+/* 修改样式 */
+.el-pagination{margin-top: 20px;}

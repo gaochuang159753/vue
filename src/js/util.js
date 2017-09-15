@@ -1,0 +1,1 @@
+exports.testUrl="http://hzmozhi.com:81";

@@ -2,9 +2,9 @@
   <div id="app">
     <!-- <img src="./assets/logo.png"> -->
     <router-view></router-view>
-    <footer>
+    <!-- <footer>
       <h1>傻果科技有限公司</h1>
-    </footer>
+    </footer> -->
   </div>
 </template>
 
