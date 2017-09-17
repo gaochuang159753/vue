@@ -15,7 +15,7 @@
               <el-button type="text" v-else>取消关注</el-button>
             </el-col>
             <el-col :span="6" class="text_align_right">
-              <el-button type="text">邀请回答</el-button>
+              <el-button type="text" @click="yaoqingda(qaDetail)">邀请回答</el-button>
               <el-button type="primary" @click="mywenda">我来回答</el-button>
             </el-col>
           </el-row>
@@ -127,7 +127,14 @@ export default {
       self.$get(url,param,successd);
     },
     mywenda(){
+      localStorage.activeName=1;
       this.$router.push('/index/mywenda')
+    },
+    yaoqingda(q){
+      localStorage.title=q.title;
+      localStorage.qid=q.qid;
+      localStorage.pingjia=true;
+      this.$router.push('/index/add/2');
     },
     clickOper(opType,clickType,opId){
       var self=this;

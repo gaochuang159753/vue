@@ -12,6 +12,10 @@ export default {
             }).then(function(params) {
                 if(params.data.code ==0){
                     successd(params.data);
+                }else if(params.data.code==50003||params.data.code==50007||params.data.code==50005){
+                    self.$router.push('/login/2');
+                }else if(params.data.code==50008){
+                    self.$router.push('/index/1');
                 }else{
                     self.$message.error(params.data.message)
                 }
@@ -28,7 +32,15 @@ export default {
                 if(params.data.code ==0){
                     successd(params.data);
                 }else{
-                    self.$message.error(params.data.message)
+                    if(params.data.code ==0){
+                        successd(params.data);
+                    }else if(params.data.code==50003||params.data.code==50007||params.data.code==50005){
+                        self.$router.push('/login/2');
+                    }else if(params.data.code==50008){
+                        self.$router.push('/index/1');
+                    }else{
+                        self.$message.error(params.data.message)
+                    }
                 }
             });
         }
@@ -59,5 +71,28 @@ export default {
                 this.$router.push('/login')
             }
         }
+        Vue.prototype.$date = function (date,type) {
+            if (date == "" || date == null) {
+              return;
+            } else {
+              var d = new Date(date);
+              var newdate = "";
+              if (type == "month") {
+                newdate = d.getFullYear()+"-" + (d.getMonth() > 8 ? d.getMonth() + 1 : "0" + (d.getMonth() + 1));
+              } else if(type=="time"){
+                newdate = d.getFullYear() + '-'
+                + (d.getMonth() > 8 ? d.getMonth() + 1 : "0" + (d.getMonth() + 1)) + '-'
+                + (d.getDate() > 9 ? d.getDate() : "0" + (d.getDate()))
+                +" "+(d.getHours()>9?d.getHours():"0"+d.getHours())+":"
+                +(d.getMinutes()>9?d.getMinutes():"0"+d.getMinutes())+":"
+                +(d.getSeconds()>9?d.getMinutes():"0"+d.getMinutes());
+              }else {
+                newdate = d.getFullYear() + '-'
+                + (d.getMonth() > 8 ? d.getMonth() + 1 : "0" + (d.getMonth() + 1)) + '-'
+                + (d.getDate() > 9 ? d.getDate() : "0" + (d.getDate()));
+              }
+              return newdate
+            }
+          }
     }
 }

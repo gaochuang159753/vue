@@ -13,7 +13,7 @@
             <span class="margin_left_50 list_li2_span">{{q.join}}人参与</span>
             <span class="margin_left_50 list_li2_span">{{q.answerTotal}}个回答</span>
             <div class="right_btn">
-              <el-button type="text">邀请回答</el-button>
+              <el-button type="text" @click="yaoqingda(q)">邀请回答</el-button>
               <el-button type="primary" @click="mywenda(q.qid)">我来回答</el-button>
             </div>
           </li>
@@ -51,8 +51,8 @@
             <span class="margin_left_50 list_li2_span">{{good.follow}}人关注</span>
             <span class="margin_left_50 list_li2_span">{{good.comment}}个评价</span>
             <div class="right_btn">
-              <el-button type="text">邀请评价</el-button>
-              <el-button type="primary">我来评价</el-button>
+              <el-button type="text" @click="yaoqingpingjia(good)">邀请评价</el-button>
+              <el-button type="primary" @click="gopingjia()">我来评价</el-button>
             </div>
           </li>
           </ul>
@@ -173,11 +173,28 @@ export default {
     },
     mywenda(qid){
       localStorage.qid=qid;
+      localStorage.activeName=1;
       this.$router.push('/index/mywenda');
     },
     personal(uid){
       localStorage.uid=uid;
       this.$router.push('/index/userDetail')
+    },
+    yaoqingda(q){
+      localStorage.title=q.title;
+      localStorage.qid=q.qid;
+      localStorage.pingjia=true;
+      this.$router.push('/index/add/2');
+    },
+    yaoqingpingjia(good){
+      localStorage.goodsId=good.goodsId;
+      localStorage.goodsName=good.goodsName;
+      localStorage.pingjia=true;
+      this.$router.push('/index/add/1');
+    },
+    gopingjia(){
+      localStorage.activeName=2;
+      this.$router.push('/index/mywenda');
     }
   }
 }

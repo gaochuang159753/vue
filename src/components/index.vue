@@ -85,6 +85,7 @@ export default {
       this.$router.push('/index/wenda');
     },
     goadd(type){
+      this.$router.go(0);
       this.$router.push('/index/add/'+type);
     },
     gopersonal(){

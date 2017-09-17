@@ -16,8 +16,8 @@
             <span class="margin_left_50 list_li2_span">{{list.comment}}人评价</span>
             <!-- <span class="margin_left_50 list_li2_span">34个回答</span> -->
             <div class="right_btn">
-              <el-button type="text">邀请评价</el-button>
-              <el-button type="primary">我来评价</el-button>
+              <el-button type="text" @click="yaoqingpingjia(list)">邀请评价</el-button>
+              <el-button type="primary" @click="gopingjia">我来评价</el-button>
             </div>
           </li>
           
@@ -43,7 +43,7 @@
             <span class="margin_left_50 list_li2_span">{{list.join}}人参与</span>
             <span class="margin_left_50 list_li2_span">34个回答</span>
             <div class="right_btn">
-              <el-button type="text">邀请评价</el-button>
+              <el-button type="text" @click="yaoqingda(list)">邀请评价</el-button>
               <el-button type="primary" @click="mywenda(list.qid)">我来评价</el-button>
             </div>
           </li>
@@ -75,7 +75,10 @@
           <dd class="yonghu_name" @click="userDetail(list.uid)">{{list.name}}</dd>
           <dd>账号 ： {{list.email}}</dd>
           <dd class="yonghu_two">{{list.sector}}<span>前{{list.topPercent}}</span></dd>
-          <dd class="yonghu_guanzhu"><span>{{list.follow}}人关注</span><el-button type="primary">+关注</el-button></dd>
+          <dd class="yonghu_guanzhu"><span>{{list.follow}}人关注</span>
+            <el-button type="primary" @click="operFollow(1,2,list.uid)" v-if="list.isFollow==0">+关注</el-button>
+            <el-button type="primary" @click="operFollow(2,2,list.uid)" v-else>取消关注</el-button>
+          </dd>
         </dl>
         <el-pagination
           small
@@ -348,6 +351,7 @@ export default {
     },
     mywenda(qid){
       localStorage.qid=qid;
+      localStorage.activeName=1;
       this.$router.push("/index/mywenda");
     },
     wendaDetail(qid){
@@ -357,6 +361,31 @@ export default {
     goodsDetail(id){
       localStorage.goodsId=id;
       this.$router.push('/index/goodsDetail');
+    },
+    yaoqingpingjia(good){
+      localStorage.goodsId=good.goodsId;
+      localStorage.goodsName=good.itemName;
+      localStorage.pingjia=true;
+      this.$router.push('/index/add/1');
+    },
+    gopingjia(){
+      localStorage.activeName=2;
+      this.$router.push('/index/mywenda');
+    },
+    yaoqingda(q){
+      localStorage.title=q.title;
+      localStorage.qid=q.qid;
+      localStorage.pingjia=true;
+      this.$router.push('/index/add/2');
+    },
+    operFollow(opType,followType,followId){
+      var self=this;
+      var url="/operFollow",
+          param={opType:opType,followType:followType,followId:followId},
+          successd=function(res){
+            self.index();
+          };
+      self.$get(url,param,successd);
     }
   }
 }

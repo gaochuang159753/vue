@@ -9,7 +9,7 @@
               <el-input v-model="ruleForm2.name" placeholder="请输入姓名"></el-input>
             </el-form-item>
             <el-form-item label="邮箱" prop="phone">
-              <el-input v-model.number="ruleForm2.phone" placeholder="请输入邮箱"></el-input>
+              <el-input v-model="ruleForm2.phone" placeholder="请输入邮箱"></el-input>
             </el-form-item>
             <el-form-item label="密码" prop="pass" required>
               <el-input type="password" v-model="ruleForm2.pass" auto-complete="off" placeholder="请输入密码"></el-input>
@@ -25,14 +25,14 @@
         <el-tab-pane label="登录" name="2">
           <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="80px" class="demo-ruleForm">
             <el-form-item label="邮箱" prop="phone" required>
-              <el-input v-model.number="ruleForm1.phone" placeholder="请输入邮箱"></el-input>
+              <el-input v-model="ruleForm1.phone" placeholder="请输入邮箱"></el-input>
             </el-form-item>
             <el-form-item label="密码" prop="pass">
               <el-input type="password" v-model="ruleForm1.pass" auto-complete="off" placeholder="请输入密码"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitLogin('ruleForm1')">登录</el-button>
-              <el-button type="text">忘记密码？</el-button>
+              <!-- <el-button type="text">忘记密码？</el-button> -->
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -76,8 +76,10 @@ export default {
       },
       rules2:{
         name:[{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        phone:[{ required: true, message: '请输入邮箱地址', trigger: 'blur' },
-                { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }],
+        phone:[
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+        ],
         pass:[{ validator: validatePass, trigger: 'blur' }],
         checkPass:[{ validator: validatePass2, trigger: 'blur' }]
       },
@@ -86,7 +88,10 @@ export default {
         pass:''
       },
       rules1:{
-        phone:[{type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }],
+        phone:[
+          { required: true, message: '请输入邮箱地址', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+        ],
         pass:[{required: true, message: '请输入密码', trigger: 'blur' }]
       }
     }
@@ -130,12 +135,15 @@ export default {
           var url="/emailReg",
               param={
                 email:self.ruleForm2.phone,
-                pwd:self.ruleForm2.pass,
+                pwd:md5(self.ruleForm2.pass),
                 userName:self.ruleForm2.name,
-                repwd:self.ruleForm2.checkPass
+                repwd:md5(self.ruleForm2.checkPass)
               },
               successd=function(res){
-                console.log(res);
+                self.$message({
+                  message:'注册成功！请到邮箱激活',
+                  type:'success'
+                })
               };
           self.$post(url,param,successd);
         } else {

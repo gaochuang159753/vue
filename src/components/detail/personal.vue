@@ -2,14 +2,44 @@
   <div id="personal">
     <el-tabs v-model="activeName">
       <el-tab-pane label="我的消息" name="1">
-        <p><span></span>张三李四要请我的回答<el-button type="text">查看邀请我的列表</el-button></p>
-        
-        <el-row>
-          <el-col :span="20">
-            <h1>如何选择婴儿奶瓶的材质？</h1>
-          </el-col>
-          <el-col>品类：&nbsp; &nbsp; 奶瓶</el-col>
-        </el-row>
+        <div v-for="msg in msgs" :key="msg.msgId" class="msgs">
+          <el-row>
+            <el-col :span="12">
+              <span class="noread" v-if="msg.isRead==1"></span>
+              <span class="font_size_14">{{msg.tip}}</span>
+            </el-col>
+            <el-col :span="12">
+              <el-button type="text" v-if="msg.type==1" @click="myyaoqingList(msg)">查看邀请我的列表</el-button>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="16">
+              <h1>{{msg.title}}</h1>
+            </el-col>
+            <el-col :span="4">推荐分：<span class="font_size_20">{{msg.recScore}}</span></el-col>
+            <el-col :span="4" class="text_algin_right">品类：&nbsp; &nbsp; {{msg.sector}}</el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="4">
+              <el-tag type="danger">{{msg.tag}}</el-tag>
+            </el-col>
+            <el-col :span="10">
+              <span>{{msg.follow}}人关注</span>
+              <span class="margin_left_20">{{msg.join}}人参与</span>
+              <span class="margin_left_20">{{msg.answerTotal}}个回答</span>
+            </el-col>
+            <el-col :span="6" class="text_align_right">
+              <el-button type="text" v-if="msg.eventType==1&&msg.type==2" @click="wendaDetail(msg.eventId)">查看回答</el-button>
+              <el-button type="text" v-if="msg.eventType==1&&msg.type==3" @click="wendaDetail(msg.eventId)">查看我的回答</el-button>
+              <el-button type="text" v-if="msg.eventType==1">邀请回答</el-button>
+              <el-button type="text" v-if="msg.eventType==2">邀请评价</el-button>
+            </el-col>
+            <el-col :span="4" class="text_align_right">
+              <el-button type="primary" v-if="msg.eventType==1" @click="mywenda(msg.eventId)">我来回答</el-button>
+              <el-button type="primary" v-if="msg.eventType==2">我来评价</el-button>
+            </el-col>
+          </el-row>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="我的评价" name="2">
         <p>
@@ -50,10 +80,11 @@
             </div>
             <div class="techang">
               <span>特长:</span>
-              <el-tag type="success" v-for="special in userDetail.speciality" :key="special" :closable="true" class="margin_left_20">{{special}}</el-tag>
+              <el-tag type="success" v-for="special in userDetail.speciality" :key="special.id" :closable="true" class="margin_left_20" @close="delespecial(special.id)">{{special.name}}</el-tag>
               <!-- <el-tag type="warning" style="margin-left:50px;">{{userDetail.sector}}</el-tag> -->
-              <el-button type="primary" class="margin_left_20" size="mini">添加特长</el-button>
+              <el-button type="primary" class="add_special" size="mini" @click="addspecialShow=true">添加特长</el-button>
               <!-- <el-button type="text" class="guanzhu">取消关注</el-button> -->
+              
             </div>
           </li>
           <li>
@@ -74,22 +105,24 @@
             <el-row>
               <el-col :span="21">
                 <h1 class="display_inlineblock">专业度<el-button type="text" @click="explanationBtn(1)">(?)</el-button></h1>
-                <h2 class="display_inlineblock margin_left_50" v-for="item in profession" :key="item"><el-tag type="danger">{{item.sector}}</el-tag> &nbsp;&nbsp;&nbsp;前：<span>{{item.percent}}</span></h2>
+                <h2 class="display_inlineblock margin_left_50" v-for="(item,index) in profession" :key="item.sector" v-if="index<4">
+                  <el-tag type="danger">{{item.sector}}</el-tag> &nbsp;&nbsp;&nbsp;前：<span>{{item.percent}}</span>
+                </h2>
                 <!-- <h2 class="display_inlineblock margin_left_50"><el-tag type="danger">婴儿奶粉</el-tag> &nbsp;&nbsp;&nbsp;前：<span>1%</span></h2>
                 <h2 class="display_inlineblock margin_left_50"><el-tag type="danger">婴儿奶粉</el-tag> &nbsp;&nbsp;&nbsp;前：<span>1%</span></h2> -->
               </el-col>
               <el-col :span="3" style="text-align:right;">
-                <el-button type="text">所有排名</el-button>
+                <el-button type="text" @click="allshow=true;" v-if="profession.length>3">所有排名</el-button>
               </el-col>
             </el-row>
             <h1 class="margin_top_20">我的关注</h1>
             <el-row v-for="follow in userDetail.follows" :key="follow.type">
               <el-col :span="2" :offset="1">{{follow.type}}</el-col>
-              <el-col :span="18">
+              <el-col :span="21">
                 <!-- <span v-for="item in follow.items" :key="item">{{item}}</span> -->
-                <el-tag type="gray" v-for="item in follow.items" :key="item" :closable="true" class="margin_left_20">{{item}}</el-tag>
+                <el-tag type="gray" v-for="(item,index) in follow.items" :key="item.id" :closable="true" class="margin_left_20" @close="operFollow(2,follow.type,item.id)" v-if="index<4&&follow.morenoShow">{{item.name}}</el-tag>
               </el-col>
-              <el-col :span="3" class="text_align_right"><el-button type="text">...更多</el-button></el-col>
+              <el-col :span="3" class="text_align_right"><el-button type="text" @click="more(follow.morenoShow)" v-if="follow.items.length>3">...{{morenoCon}}</el-button></el-col>
             </el-row>
           </li>
         </ul>
@@ -101,6 +134,54 @@
       v-model="explanationShow"
       size="tiny">
       <span>{{explanation.content}}</span>
+    </el-dialog>
+    <el-dialog
+      title="添加特长"
+      v-model="addspecialShow">
+      <el-form :model="specialForm">
+        <el-form-item label="输入品类名">
+          <el-select v-model="specialForm.sectorId" filterable placeholder="请选择品类">
+            <el-option
+              v-for="item in sectorList"
+              :key="item.sid"
+              :label="item.name"
+              :value="item.sid">
+            </el-option>
+          </el-select>
+          <el-button type="text">没找到品类？新增一个</el-button>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addspecialShow = false">取 消</el-button>
+        <el-button type="primary" @click="addspecial">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="我的专业度"
+      v-model="allshow"
+      size="tiny">
+      <el-row v-for="item in profession" :key="item.sector">
+        <el-col :span='8'>{{item.sector}}</el-col>
+        <el-col :span='8'>前{{item.percent}}</el-col>
+        <el-col :span='8'>{{item.score}}分</el-col>
+      </el-row>
+    </el-dialog>
+    <el-dialog
+      title="邀请我的列表"
+      v-model="yaoqingShow"
+      size="tiny">
+      <el-row>
+        <el-col :span='20'>
+          <h1>{{yaoqing.title}}</h1>
+        </el-col>
+        <el-col :span='4'>{{yaoqing.type==1?'问答':'评价'}}</el-col>
+      </el-row>
+      <el-row v-for="friend in friends" :key="friend.uid" class="margin_top_20">
+        <el-col :span='2'>
+          <img :src="friend.avatar" alt="头像" width="50px" height="50px">
+        </el-col>
+        <el-col :span='22'>{{friend.name}}</el-col>
+      </el-row>
     </el-dialog>
   </div>
 </template>
@@ -122,6 +203,20 @@ export default {
       pageSize:10,
       myComments:[],
       msgs:[],
+      addspecialShow:false,
+      sectorList:[],
+      specialForm:{
+        sectorId:'',
+      },
+      allshow:false,
+      morenoShow:true,
+      morenoCon:'展开',
+      friends:[],
+      yaoqing:{
+        title:'',
+        type:'1',
+      },
+      yaoqingShow:false,
     }
   },
   mounted(){
@@ -129,6 +224,7 @@ export default {
     this.myInfo();
     this.getmyMsgs();
     this.getmyComments();
+    this.getsectorList();
   },
   methods:{
     index(){
@@ -144,6 +240,9 @@ export default {
             console.log(res);
             self.userDetail=res.data.userInfo;
             self.profession=res.data.userInfo.profession;
+            self.userDetail.follows.forEach(function(ele) {
+              ele.morenoShow=true;
+            });
           };
       self.$get(url,{},successd);
     },
@@ -197,6 +296,89 @@ export default {
     },
     goadd(type){
       this.$router.push("/index/add/"+type);
+    },
+    mywenda(qid){
+      localStorage.qid=qid;
+      this.$router.push('/index/mywenda');
+    },
+    operFollow(opType,followType,followId){
+      var self=this;
+      switch (followType) {
+        case "问题":
+          followType='1';
+          break;
+        case "用户":
+          followType='2';
+          break;
+        case "商品":
+          followType='3';
+          break;
+        case "服务":
+          followType="4";
+          break;
+        case "品类":
+          followType='4';
+          break;
+        default:
+          break;
+      }
+      var url="/operFollow",
+          param={opType:opType,followType:followType,followId:followId},
+          successd=function(res){
+            self.myInfo();
+          };
+      self.$get(url,param,successd);
+    },
+    getsectorList(){
+      var self=this;
+      var url="/sectorList",
+          successd=function(res){
+            self.sectorList=res.data.sectors;
+          };
+      self.$get(url,{},successd);
+    },
+    addspecial(){
+      var self=this;
+      var url="/operSpecial",
+          param={type:1,sectorId:self.specialForm.sectorId},
+          successd=function(res){
+            self.addspecialShow=false;
+            self.myInfo();
+          };
+      self.$get(url,param,successd);
+    },
+    delespecial(id){
+      var self=this;
+      var url="/operSpecial",
+          param={type:2,sectorId:id},
+          successd=function(res){
+            self.$message({
+              message:'删除成功！',
+              type:'success'
+            });
+            self.myInfo();
+          };
+      self.$get(url,param,successd);
+    },
+    more(morenoShow){
+      if(this.morenoCon=="展开"){
+        this.morenoCon="收起";
+      }else{
+        this.morenoCon="展开";
+      }
+      morenoShow=!morenoShow;
+    },
+    myyaoqingList(msg){
+      var self=this;
+      self.yaoqing.title=msg.title;
+      self.yaoqing.type=msg.eventType;
+      var url="/inviteList",
+          param={type:msg.eventType,eventId:msg.eventId},
+          successd=function(res){
+            self.friends=res.data.friends;
+            self.yaoqingShow=true;
+          };
+      self.$get(url,param,successd);
     }
   }
 }
@@ -211,6 +393,8 @@ export default {
   .headName h2{float: right;}
   .techang{height: 50px;margin-left: 120px;}
   .techang .guanzhu{float: right;}
-  .myComments{padding-bottom: 10px;border-bottom: 1px solid #ddd;}
+  .myComments,.msgs{padding-bottom: 10px;border-bottom: 1px solid #ddd;}
+  .noread{width: 10px;height: 10px;border-radius: 50%;background-color: #f00;display: inline-block;}
+  .add_special{margin-left: 20px;}
 </style>
 

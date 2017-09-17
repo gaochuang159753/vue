@@ -4,7 +4,7 @@ import Hello from '@/components/Hello'
 import index from '@/components/index'
 import wenda from '@/components/index/wenda.vue'
 import search from '@/components/index/searchResult'
-import yaoqingpingjia from '@/components/index/yaoqingpingjia'
+import yaoqing from '@/components/index/yaoqing'
 import goodsDetail from '@/components/detail/goodsDetail'
 import searchNull from '@/components/index/seachNull';
 import userDetail from '@/components/detail/userDetail';
@@ -55,9 +55,9 @@ export default new Router({
           component:search
         },
         {
-          path:'/index/yaoqingpingjia',
-          name:'yaoqingpingjia',
-          component:yaoqingpingjia
+          path:'/index/yaoqing',
+          name:'yaoqing',
+          component:yaoqing
         },
         {
           path:'/index/goodsDetail',
