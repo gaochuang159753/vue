@@ -36,7 +36,7 @@
             </el-col>
             <el-col :span="4" class="text_align_right">
               <el-button type="primary" v-if="msg.eventType==1" @click="mywenda(msg.eventId)">我来回答</el-button>
-              <el-button type="primary" v-if="msg.eventType==2">我来评价</el-button>
+              <el-button type="primary" v-if="msg.eventType==2" @click="gopingjia">我来评价</el-button>
             </el-col>
           </el-row>
         </div>
@@ -65,7 +65,7 @@
             <span class="margin_right_20">质量／品质：{{myComment.option1}}</span>
             <span class="margin_right_20">功能／效果：{{myComment.option2}}</span>
             <span class="margin_right_20">服务态度：{{myComment.option3}}</span>
-            <el-button type="primary">修改评价</el-button>
+            <el-button type="primary" @click="xiugaipingjia">修改评价</el-button>
           </el-col>
         </el-row>
         </div>
@@ -76,7 +76,7 @@
             <img :src="userDetail.avatar" alt="" class="headImg">
             <div class="headName">
               <h2>{{userDetail.follow}}人关注</h2>
-              <h1>{{userDetail.name}}<i class="el-icon-edit font_size_16 margin_left_20 cursor_pointer color_20a0ff"></i></h1>
+              <h1>{{userDetail.name}}<i class="el-icon-edit font_size_16 margin_left_20 cursor_pointer color_20a0ff" @click="setUser"></i></h1>
             </div>
             <div class="techang">
               <span>特长:</span>
@@ -135,6 +135,7 @@
       size="tiny">
       <span>{{explanation.content}}</span>
     </el-dialog>
+
     <el-dialog
       title="添加特长"
       v-model="addspecialShow">
@@ -156,6 +157,7 @@
         <el-button type="primary" @click="addspecial">确 定</el-button>
       </span>
     </el-dialog>
+
     <el-dialog
       title="我的专业度"
       v-model="allshow"
@@ -166,6 +168,7 @@
         <el-col :span='8'>{{item.score}}分</el-col>
       </el-row>
     </el-dialog>
+
     <el-dialog
       title="邀请我的列表"
       v-model="yaoqingShow"
@@ -182,6 +185,34 @@
         </el-col>
         <el-col :span='22'>{{friend.name}}</el-col>
       </el-row>
+    </el-dialog>
+
+    <el-dialog
+      title="修改个人信息"
+      v-model="setpersonalShow">
+      <el-form :model="perForm">
+        <el-form-item label="修改头像" label-width="100px">
+          <el-upload
+            class="avatar-uploader"
+            action="http://hzmozhi.com:81//uploadAvatar"
+            :data="uploadAvatarData"
+            name="imageUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+
+        </el-form-item>
+        <el-form-item label="修改姓名" label-width="100px">
+          <el-input type="text" v-model="perForm.name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setpersonalShow = false">取 消</el-button>
+        <el-button type="primary" @click="editUser">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -217,6 +248,12 @@ export default {
         type:'1',
       },
       yaoqingShow:false,
+      setpersonalShow:false,
+      perForm:{
+        name:'',
+      },
+      imageUrl: '',
+      uploadAvatarData:{accessToken:this.getCookie('accessToken')}
     }
   },
   mounted(){
@@ -379,22 +416,86 @@ export default {
             self.yaoqingShow=true;
           };
       self.$get(url,param,successd);
+    },
+    gopingjia(){
+      localStorage.activeName=2;
+      this.$router.push('/index/mywenda');
+    },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl=res.data.fileurl;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg'||file.type === 'image/png'||file.type === 'image/gif';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+    },
+    setUser(){
+      var self=this;
+      self.imageUrl=self.userDetail.avatar;
+      self.perForm.name=self.userDetail.name;
+      self.setpersonalShow=true;
+    },
+    editUser(){
+      var self=this;
+      var url="/editUser",
+          param={
+            userName:self.perForm.name
+          },
+          successd=function(res){
+            self.setpersonalShow=false;
+            self.myInfo();
+          };
+      self.$post(url,param,successd);
+    },
+    xiugaipingjia(){
+      localStorage.activeName=2;
+      this.$router.push("/index/mywenda");
     }
   }
 }
 </script>
 
-<style scoped>
-#personal{width: 1000px;margin: 0 auto;}
-#personal h2,#personal h3,#personal h4,#personal h5{font-weight: 400;}
-  .headImg{width: 100px;height: 100px;display: block;background-color: #eee;float: left;}
-  .headName{height: 50px;margin-left: 120px;line-height: 50px;}
-  .headName h1{font-size: 28px;}
-  .headName h2{float: right;}
-  .techang{height: 50px;margin-left: 120px;}
-  .techang .guanzhu{float: right;}
-  .myComments,.msgs{padding-bottom: 10px;border-bottom: 1px solid #ddd;}
-  .noread{width: 10px;height: 10px;border-radius: 50%;background-color: #f00;display: inline-block;}
-  .add_special{margin-left: 20px;}
+<style>
+  #personal{width: 1000px;margin: 0 auto;}
+  #personal h2,#personal h3,#personal h4,#personal h5{font-weight: 400;}
+  #personal .headImg{width: 100px;height: 100px;display: block;background-color: #eee;float: left;}
+  #personal .headName{height: 50px;margin-left: 120px;line-height: 50px;}
+  #personal .headName h1{font-size: 28px;}
+  #personal .headName h2{float: right;}
+  #personal .techang{height: 50px;margin-left: 120px;}
+  #personal .techang .guanzhu{float: right;}
+  #personal .myComments,.msgs{padding-bottom: 10px;border-bottom: 1px solid #ddd;}
+  #personal .noread{width: 10px;height: 10px;border-radius: 50%;background-color: #f00;display: inline-block;}
+  #personal .add_special{margin-left: 20px;}
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #20a0ff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
 

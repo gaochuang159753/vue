@@ -419,7 +419,7 @@ export default {
               message:"评价成功！",
               type:'success'
             })
-            localStorage.goodsId=self.from.goodsId;
+            localStorage.goodsId=self.form.goodsId;
             self.$router.push('/index/goodsDetail');
           };
       self.$get(url,param,successd);

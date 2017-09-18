@@ -31,17 +31,20 @@
         </el-form>
         
       </el-tab-pane>
-      <el-tab-pane label="添加问题" name="2" v-if="activeName==2">
+      <el-tab-pane label="邀请答题" name="2" v-if="activeName==2">
         <el-form ref="form" :model="form2" label-width="80px">
           <el-form-item label="问题标题">
-            <el-input v-model="form2.title" placeholder="请输入问题标题" :disabled="yaoqing"></el-input>
+            <el-select v-model="form2.inviteId" filterable placeholder="请选择问题" :disabled="yaoqing">
+              <el-option :label="question.title" :value="question.qid" v-for="question in questions" :key="question.qid"></el-option>
+            </el-select>
+            <el-button type='text' @click="addQaShow=true">添加问题</el-button>
           </el-form-item>
-          <el-form-item label="所属品类">
+          <!-- <el-form-item label="所属品类">
             <el-select v-model="form2.sectorId" filterable placeholder="请选择商品品类" :disabled="yaoqing">
               <el-option :label="sector.name" :value="sector.sid" v-for="sector in sectorList" :key="sector.sid"></el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="问题标签">
+          </el-form-item> -->
+          <!-- <el-form-item label="问题标签">
             <el-radio class="radio" v-model="form2.tagId" label="1">
               <el-tag type="danger">参数选型</el-tag>
               <el-button type="text" @click="explanationBtn(1)">(?)</el-button>
@@ -58,7 +61,7 @@
               <el-tag type="danger">评测体验</el-tag>
               <el-button type="text" @click="explanationBtn(4)">(?)</el-button>
             </el-radio>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="邀请关注">
             <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
             <div style="margin: 15px 0;"></div>
@@ -67,7 +70,7 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addQa">确定创建</el-button>
+            <el-button type="primary" @click="addGoods">确定邀请</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -88,6 +91,7 @@
       size="tiny">
       <span>{{explanation.content}}</span>
     </el-dialog>
+
     <el-dialog
       title="添加商品/服务"
       v-model="addGoodsSvr"
@@ -111,6 +115,44 @@
         <el-button type="primary" @click="addGoods4">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      title="添加问题"
+      v-model="addQaShow"
+      size="small">
+      <el-form ref="form" :model="form5" label-width="80px">
+        <el-form-item label="问题标题">
+          <el-input v-model="form5.title" placeholder="请输入问题标题"></el-input>
+        </el-form-item>
+        <el-form-item label="所属品类">
+          <el-select v-model="form5.sectorId" placeholder="请选择商品品类">
+            <el-option :label="sector.name" :value="sector.sid" v-for="sector in sectorList" :key="sector.sid"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="问题标签">
+          <el-radio class="radio" v-model="form5.tagId" label="1">
+            <el-tag type="danger">参数选型</el-tag>
+            <el-button type="text" @click="explanationBtn(1)">(?)</el-button>
+          </el-radio>
+          <el-radio class="radio" v-model="form5.tagId" label="2">
+            <el-tag type="danger">使用保养</el-tag>
+            <el-button type="text" @click="explanationBtn(2)">(?)</el-button>
+          </el-radio>
+          <el-radio class="radio" v-model="form5.tagId" label="3">
+            <el-tag type="danger">辨别真伪</el-tag>
+            <el-button type="text" @click="explanationBtn(3)">(?)</el-button>
+          </el-radio>
+          <el-radio class="radio" v-model="form5.tagId" label="4">
+            <el-tag type="danger">评测体验</el-tag>
+            <el-button type="text" @click="explanationBtn(4)">(?)</el-button>
+          </el-radio>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addQaShow = false">取 消</el-button>
+        <el-button type="primary" @click="addQa">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -123,12 +165,14 @@ export default {
         title:'',
         sectorId:'',
         tagId:'1',
+        inviteId:''
       },
       form:{
         opType:"1",
         title:'',
         sectorId:'',
         goodsId:'',
+        inviteId:'',
       },
       form4:{
         opType:"1",
@@ -137,6 +181,11 @@ export default {
       },
       form3:{
         title:''
+      },
+      form5:{
+        title:'',
+        sectorId:'',
+        tagId:'1',
       },
       explanation:{
         title:'标签解读:参数选型',
@@ -153,12 +202,15 @@ export default {
       yaoqing:false,
       goodSvrs:[],
       addGoodsSvr:false,
+      addQaShow:false,
+      questions:[],
     }
   },
   mounted(){
     this.index();
     this.getsectorList();
     this.searchGoodsSvr();
+    this.getsearchQa();
   },
   methods:{
     index(){
@@ -231,10 +283,18 @@ export default {
       //       // self.getList1();
       //       // self.$router.push('')
       //     };
-      var yaoqingurl="/inviteFriend",
-          yaoqingparam={tuserId:self.friendIds.join(),type:'2',inviteId:self.form.goodsId},
-          yaoqingsuccessd=function(res){
+      var yaoqingurl="/inviteFriend";
+      if(self.activeName==1){
+        var yaoqingparam={tuserIds:self.friendIds.join(),type:'2',inviteId:self.form.goodsId};
+      }else{
+        var yaoqingparam={tuserIds:self.friendIds.join(),type:'1',inviteId:self.form2.inviteId};
+      }
+      var yaoqingsuccessd=function(res){
             localStorage.goodsId=self.form.goodsId;
+            self.$message({
+              message:'邀请成功！',
+              type:'success'
+            })
           };
       // if(self.yaoqing){
         self.$get(yaoqingurl,yaoqingparam,yaoqingsuccessd);
@@ -245,12 +305,12 @@ export default {
     addQa(){
       var self=this;
       var url="/addQa";
-      var param=self.form2;
-      param.friendIds=self.friendIds.join();
+      var param=self.form5;
+      // param.friendIds=self.friendIds.join();
       var successd=function(res){
         console.log(res);
         self.addQaShow=false;
-        // self.getList2();
+        self.getsearchQa();
       }
       self.$get(url,param,successd);
     },
@@ -286,6 +346,15 @@ export default {
       // }else{
         self.$get(addurl,addparam,addsuccessd);
       // } 
+    },
+    getsearchQa(){
+      var self=this;
+      var url="/searchQa",
+          param={all:1},
+          successd=function(res){
+            self.questions=res.data.questions;
+          };
+      self.$get(url,param,successd);
     }
   }
 }

@@ -12,7 +12,7 @@
             <el-col :span="8" style="text-align:center;font-size:12px;"> {{qaDetail.follow}}人关注 &nbsp; &nbsp; {{qaDetail.join}}人参与 &nbsp; &nbsp; {{qaDetail.answerTotal}}个回答</el-col>
             <el-col :span="6" class="text_align_right">
               <el-button type="text" v-if="qaDetail.followQuestion==0" @click="operFollow(1,1,qaDetail.qid)">关注问题</el-button>
-              <el-button type="text" v-else>取消关注</el-button>
+              <el-button type="text" v-else @click="operFollow(2,1,qaDetail.qid)">取消关注</el-button>
             </el-col>
             <el-col :span="6" class="text_align_right">
               <el-button type="text" @click="yaoqingda(qaDetail)">邀请回答</el-button>
@@ -48,7 +48,7 @@
       </el-tab-pane>
     </el-tabs>
     <el-dialog
-      title="添加商品/服务"
+      title="添加评论"
       v-model="addCommentShow">
       <el-input
         type="textarea"
